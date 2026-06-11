@@ -1,0 +1,85 @@
+# Spring Boot 프로젝트 도움말 파일 (불필요)
+HELP.md
+# Gradle 캐시 및 빌드 관련 디렉토리
+.gradle
+# 빌드 결과물 디렉토리
+build/
+# Gradle Wrapper는 버전 관리 필요하므로 예외
+!gradle/wrapper/gradle-wrapper.jar
+# 소스 빌드 결과물은 예외
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+# Spring Tool Suite 자동 생성 파일
+.apt_generated
+# Eclipse 클래스패스 설정 파일
+.classpath
+# Eclipse 팩토리패스 설정 파일
+.factorypath
+# Eclipse 프로젝트 설정 파일
+.project
+# Eclipse 설정 디렉토리
+.settings
+# Spring Beans 설정 파일
+.springBeans
+# STS4 캐시 디렉토리
+.sts4-cache
+# 컴파일된 바이너리 디렉토리
+bin/
+# 소스 바이너리는 예외
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+# IntelliJ 프로젝트 설정 디렉토리
+.idea
+# IntelliJ 워크스페이스 파일
+*.iws
+# IntelliJ 모듈 파일
+*.iml
+# IntelliJ 프로젝트 파일
+*.ipr
+# IntelliJ 출력 디렉토리
+out/
+# 소스 출력 디렉토리는 예외
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+# NetBeans 프로젝트 설정 디렉토리
+/nbproject/private/
+# NetBeans 빌드 디렉토리
+/nbbuild/
+# NetBeans 배포 디렉토리
+/dist/
+# NetBeans 배포 디렉토리
+/nbdist/
+# NetBeans Gradle 플러그인 디렉토리
+/.nb-gradle/
+
+### VS Code ###
+# VS Code 설정 디렉토리
+.vscode/
+
+# 로컬 환경 설정 파일 (DB 비밀번호, Kakao API 키 등 민감정보)
+application-local.properties
+# 시크릿 설정 파일
+application-secret.properties
+# 환경변수 파일
+*.env
+.env
+
+### Logs ###
+# 로그 파일
+*.log
+# 로그 디렉토리
+logs/
+
+### macOS ###
+# macOS 자동 생성 메타데이터 파일
+.DS_Store
+
+### Windows ###
+# Windows 썸네일 캐시 파일
+Thumbs.db
