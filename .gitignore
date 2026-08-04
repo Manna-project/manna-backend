@@ -68,6 +68,7 @@ application-local.properties
 application-secret.properties
 # 메인 설정 파일
 application.properties
+/src/main/resources/application.properties
 # 환경변수 파일
 *.env
 .env
