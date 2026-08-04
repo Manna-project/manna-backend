@@ -66,6 +66,8 @@ out/
 application-local.properties
 # 시크릿 설정 파일
 application-secret.properties
+# 메인 설정 파일
+application.properties
 # 환경변수 파일
 *.env
 .env
