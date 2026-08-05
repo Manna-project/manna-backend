@@ -1,5 +1,6 @@
 package com.manna.schedule.entity;
 
+import com.manna.auth.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
