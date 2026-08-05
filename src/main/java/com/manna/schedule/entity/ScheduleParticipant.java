@@ -1,5 +1,6 @@
 package com.manna.schedule.entity;
 
+import com.manna.auth.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,7 +10,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "schedule_participants")
+@Table(name = "schedule_participants", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_schedule_user",
+                columnNames = {"schedule_id", "user_id"})
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ScheduleParticipant {
