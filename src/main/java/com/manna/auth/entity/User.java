@@ -12,7 +12,7 @@ import java.util.UUID;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_users_logintype_providerid",
-                        columnNames = {"login_type"}
+                        columnNames = {"login_type", "provider_id"}
                 )
         }
 )
