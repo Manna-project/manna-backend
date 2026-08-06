@@ -21,7 +21,7 @@ public class FriendNickname {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "friend_nickname_id")
+    @Column()
     private Integer friendNicknameId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,13 +32,13 @@ public class FriendNickname {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "nickname", nullable = false)
+    @Column(nullable = false)
     private String nickname;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @Builder

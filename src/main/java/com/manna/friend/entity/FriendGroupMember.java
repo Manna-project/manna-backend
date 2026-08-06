@@ -20,7 +20,7 @@ public class FriendGroupMember {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "friend_group_member_id")
+    @Column()
     private Integer friendGroupMemberId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,7 +31,7 @@ public class FriendGroupMember {
     @JoinColumn(name = "friend_id", nullable = false)
     private Friend friend;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Builder
