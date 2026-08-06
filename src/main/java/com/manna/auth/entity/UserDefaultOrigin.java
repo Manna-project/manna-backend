@@ -43,8 +43,7 @@ public class UserDefaultOrigin {
 
     @Builder
 
-    public UserDefaultOrigin(Integer originId, User user, String originNameKr, String originNameEn, BigDecimal originLat, BigDecimal originLng, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.originId = originId;
+    public UserDefaultOrigin(User user, String originNameKr, String originNameEn, BigDecimal originLat, BigDecimal originLng, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.user = user;
         this.originNameKr = originNameKr;
         this.originNameEn = originNameEn;
