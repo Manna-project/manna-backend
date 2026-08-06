@@ -21,7 +21,7 @@ public class ScheduleParticipant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "schedule_participant_id")
+    @Column()
     private Integer scheduleParticipantId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,17 +33,16 @@ public class ScheduleParticipant {
     private User user;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(nullable = false)
     private ParticipantStatus status;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @Builder
-
     public ScheduleParticipant(Schedule schedule, User user, ParticipantStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.schedule = schedule;
         this.user = user;
