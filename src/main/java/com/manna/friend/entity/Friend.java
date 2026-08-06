@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "friends", uniqueConstraints = {
@@ -21,7 +23,7 @@ public class Friend {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "friend_id")
+    @Column()
     private Integer friendId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,11 +35,17 @@ public class Friend {
     private User receiver;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(nullable = false)
     private FriendStatus status;
 
-    @Column(name = "requested_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime requestedAt;
+
+    @OneToMany(mappedBy = "friend", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FriendNickname> nicknames = new ArrayList<>();
+
+    @OneToMany(mappedBy = "friend", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FriendGroupMember> groupMembers = new ArrayList<>();
 
     @Builder
     public Friend(User requester, User receiver, FriendStatus status, LocalDateTime requestedAt) {
