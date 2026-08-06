@@ -1,7 +1,7 @@
 package com.manna.auth.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,7 +16,8 @@ import java.util.UUID;
                 )
         }
 )
-@Data
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,4 +54,19 @@ public class User {
 
     @Column(nullable = false, updatable = false, unique = true)
     private UUID entityId = UUID.randomUUID();
+
+    @Builder
+    public User(Integer userId, LoginType loginType, String providerId, String email, String name, String nickname, String profileImage, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt, UUID entityId) {
+        this.userId = userId;
+        this.loginType = loginType;
+        this.providerId = providerId;
+        this.email = email;
+        this.name = name;
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.deletedAt = deletedAt;
+        this.entityId = entityId;
+    }
 }

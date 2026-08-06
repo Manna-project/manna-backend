@@ -1,14 +1,18 @@
 package com.manna.auth.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_default_origins")
-@Data
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserDefaultOrigin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,4 +40,17 @@ public class UserDefaultOrigin {
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @Builder
+
+    public UserDefaultOrigin(Integer originId, User user, String originNameKr, String originNameEn, BigDecimal originLat, BigDecimal originLng, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.originId = originId;
+        this.user = user;
+        this.originNameKr = originNameKr;
+        this.originNameEn = originNameEn;
+        this.originLat = originLat;
+        this.originLng = originLng;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 }
