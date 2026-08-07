@@ -1,0 +1,53 @@
+package com.manna.schedule.entity;
+
+import com.manna.auth.entity.User;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "schedule_participants", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_schedule_user",
+                columnNames = {"schedule_id", "user_id"})
+})
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ScheduleParticipant {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column()
+    private Integer scheduleParticipantId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_id", nullable = false)
+    private Schedule schedule;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ParticipantStatus status;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @Builder
+    public ScheduleParticipant(Schedule schedule, User user, ParticipantStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.schedule = schedule;
+        this.user = user;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+}
