@@ -69,6 +69,9 @@ application-secret.properties
 # 메인 설정 파일
 application.properties
 /src/main/resources/application.properties
+
+src/main/resources/config/application-oauth2.yml
+
 # 환경변수 파일
 *.env
 .env
