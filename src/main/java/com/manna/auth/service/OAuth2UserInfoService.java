@@ -1,9 +1,11 @@
 package com.manna.auth.service;
 
 import com.manna.auth.dto.AuthUserInfo;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+@Service
 public class OAuth2UserInfoService {
     public AuthUserInfo extract(String registrationId, Map<String, Object> attributes) {
         return switch (registrationId.toLowerCase()) {
