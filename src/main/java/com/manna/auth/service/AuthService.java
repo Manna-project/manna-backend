@@ -6,6 +6,7 @@ import com.manna.auth.entity.User;
 import com.manna.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 public class AuthService {
     private final UserRepository userRepository;
 
+    @Transactional
     public User login(AuthUserInfo userInfo) {
         LoginType loginType = getLoginType(userInfo.provider());
 
