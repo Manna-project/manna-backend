@@ -21,6 +21,11 @@ public class MidpointService {
         if (originPoints.size() < 2) {
             throw new IllegalArgumentException("최소 2명 이상의 출발지를 입력해주세요.");
         }
+        for (OriginPoint o : originPoints) {
+            if (!KoreaMainlandValidator.isMainland(o.lat(), o.lng())) {
+                throw new IllegalArgumentException("해당 위치는 지원하고 있지 않습니다.");
+            }
+        }
 
         // 초기값: 단순 평균 -> Weiszfeld 알고리즘 반복
         double lat = originPoints.stream().mapToDouble(OriginPoint::lat).average().orElseThrow();

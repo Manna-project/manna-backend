@@ -90,6 +90,14 @@ public class MidpointServiceTest {
         assertThat(result.lat()).isNotNaN();
         assertThat(result.lng()).isNotNaN();
         assertThat(result.avgDistanceKm()).isGreaterThan(0.0);
+    }
 
+    @Test
+    void 섬_예외() {
+        OriginPoint seoul = new OriginPoint("서울", 37.5665, 126.9780);
+        OriginPoint jeju = new OriginPoint("제주", 33.4996, 126.5312);
+
+        assertThatThrownBy(() -> midpointService.calculateMidpoint(List.of(seoul, jeju))).isInstanceOf(IllegalArgumentException.class);
+        
     }
 }
