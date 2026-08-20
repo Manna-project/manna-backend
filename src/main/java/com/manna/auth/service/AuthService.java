@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -47,5 +48,11 @@ public class AuthService {
             .build();
 
         return userRepository.save(newUser);
+    }
+
+    @Transactional
+    public User getUser(UUID entityId) {
+        return userRepository.findByEntityId(entityId)
+            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 }
