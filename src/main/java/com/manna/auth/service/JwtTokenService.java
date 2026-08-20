@@ -1,6 +1,7 @@
 package com.manna.auth.service;
 
 import com.manna.auth.entity.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -57,5 +58,29 @@ public class JwtTokenService {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    private Claims parseClaims(String token) {
+        return Jwts.parser()
+            .verifyWith(secretKey)
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
+    }
+
+    public String getSubject(String token) {
+        return parseClaims(token).getSubject();
+    }
+
+    public String getTokenType(String token) {
+        return parseClaims(token).get("type", String.class);
+    }
+
+    public boolean isAccessToken(String token) {
+        return validateToken(token) && "access".equals(getTokenType(token));
+    }
+
+    public boolean isRefreshToken(String token) {
+        return validateToken(token) && "refresh".equals(getTokenType(token));
     }
 }
