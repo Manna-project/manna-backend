@@ -1,6 +1,7 @@
 package com.manna.auth.service;
 
 import com.manna.auth.dto.AuthUserInfo;
+import com.manna.auth.entity.LoginType;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
