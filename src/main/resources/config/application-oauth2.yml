@@ -20,7 +20,6 @@ spring:
             client-authentication-method: client_secret_post
             client-name: Kakao
             scope:
-              - name
               - profile_nickname
               - account_email
           google:
