@@ -2,16 +2,14 @@ package com.manna.auth.service;
 
 import com.manna.auth.entity.LoginType;
 import com.manna.auth.entity.User;
-import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Encoders;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class JwtTokenServiceTest {
 

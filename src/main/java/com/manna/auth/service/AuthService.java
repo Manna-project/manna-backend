@@ -30,7 +30,7 @@ public class AuthService {
         return switch (provider.toLowerCase()) {
             case "google" -> LoginType.GOOGLE;
             case "kakao" -> LoginType.KAKAO;
-            default -> throw new IllegalArgumentException("지원하지 않는 OAuth Provider 입니다." + provider);
+            default -> throw new IllegalArgumentException("지원하지 않는 OAuth Provider 입니다: " + provider);
         };
     }
 
