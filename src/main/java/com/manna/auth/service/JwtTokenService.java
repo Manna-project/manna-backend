@@ -39,14 +39,6 @@ public class JwtTokenService {
         );
     }
 
-    public String createRefreshToken(User user) {
-        return createToken(
-            user,
-            "refresh",
-            Duration.ofDays(14)
-        );
-    }
-
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
@@ -78,9 +70,5 @@ public class JwtTokenService {
 
     public boolean isAccessToken(String token) {
         return validateToken(token) && "access".equals(getTokenType(token));
-    }
-
-    public boolean isRefreshToken(String token) {
-        return validateToken(token) && "refresh".equals(getTokenType(token));
     }
 }

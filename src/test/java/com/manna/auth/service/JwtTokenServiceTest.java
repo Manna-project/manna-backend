@@ -41,19 +41,6 @@ class JwtTokenServiceTest {
         assertThat(token).isNotBlank();
         assertThat(jwtTokenService.validateToken(token)).isTrue();
         assertThat(jwtTokenService.isAccessToken(token)).isTrue();
-        assertThat(jwtTokenService.isRefreshToken(token)).isFalse();
-        assertThat(jwtTokenService.getSubject(token))
-            .isEqualTo(user.getEntityId().toString());
-    }
-
-    @Test
-    void Refresh_Token을_생성한다() {
-        String token = jwtTokenService.createRefreshToken(user);
-
-        assertThat(token).isNotBlank();
-        assertThat(jwtTokenService.validateToken(token)).isTrue();
-        assertThat(jwtTokenService.isAccessToken(token)).isFalse();
-        assertThat(jwtTokenService.isRefreshToken(token)).isTrue();
         assertThat(jwtTokenService.getSubject(token))
             .isEqualTo(user.getEntityId().toString());
     }
