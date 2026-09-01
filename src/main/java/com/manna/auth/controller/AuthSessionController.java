@@ -50,7 +50,11 @@ public class AuthSessionController {
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(@CookieValue(name = "refresh_token") String rawRefreshToken) {
+    public void logout(@CookieValue(name = "refresh_token", required = false) String rawRefreshToken) {
+        if (rawRefreshToken == null) {
+            return;
+        }
+
         refreshTokenService.revoke(rawRefreshToken);
     }
 
