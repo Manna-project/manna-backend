@@ -112,4 +112,27 @@ class AuthSessionControllerTest {
         Mockito.verifyNoInteractions(refreshTokenService);
     }
 
+    @Test
+    void Refresh_Token_쿠키가_없어도_인증_쿠키를_삭제한다()
+        throws Exception {
+
+        MvcResult result = mockMvc.perform(
+                post("/api/v1/auth/logout")
+            )
+            .andExpect(status().isNoContent())
+            .andReturn();
+
+        List<String> cookieHeaders = result
+            .getResponse()
+            .getHeaders(HttpHeaders.SET_COOKIE);
+
+        assertThat(cookieHeaders.stream().anyMatch(
+            header -> header.startsWith("access_token=")
+        )).isTrue();
+
+        assertThat(cookieHeaders.stream().anyMatch(
+            header -> header.startsWith("refresh_token=")
+        )).isTrue();
+    }
+
 }
