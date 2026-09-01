@@ -103,4 +103,13 @@ class AuthSessionControllerTest {
             .contains("SameSite=Lax");
     }
 
+    @Test
+    void Refresh_Token_쿠키가_없어도_로그아웃은_성공한다() throws Exception {
+        mockMvc.perform(
+            post("/api/v1/auth/logout")
+        ).andExpect(status().isNoContent()).andReturn();
+
+        Mockito.verifyNoInteractions(refreshTokenService);
+    }
+
 }
