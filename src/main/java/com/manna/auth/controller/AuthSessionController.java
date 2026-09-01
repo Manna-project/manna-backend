@@ -48,6 +48,12 @@ public class AuthSessionController {
         addTokenCookies(response, accessToken, result.issuedRefreshToken());
     }
 
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@CookieValue(name = "refresh_token") String rawRefreshToken) {
+        refreshTokenService.revoke(rawRefreshToken);
+    }
+
     private void addTokenCookies(HttpServletResponse response, String accessToken, IssuedRefreshToken issuedRefreshToken) {
         ResponseCookie accessCookie = ResponseCookie
             .from("access_token", accessToken)
