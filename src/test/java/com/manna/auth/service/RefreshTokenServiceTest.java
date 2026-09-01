@@ -16,11 +16,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.HexFormat;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
@@ -86,6 +84,41 @@ class RefreshTokenServiceTest {
         LocalDateTime expectedExpiration = LocalDateTime.now(fixedClock).plusDays(14);
 
         assertThat(result.expiresAt()).isEqualTo(expectedExpiration);
+    }
+
+    @Test
+    void 유효한_Refresh_Token이면_새로운_Refresh_Token으로_갱신한다() throws Exception {
+        LocalDateTime now = LocalDateTime.now(fixedClock);
+        String oldSecret = "old-refresh-secret";
+
+        RefreshSession session = RefreshSession.issue(user, sha256(oldSecret), now.minusDays(1), Duration.ofDays(14));
+
+        LocalDateTime originalExpiresAt = session.getExpiresAt();
+        String rawRefreshToken = session.getSessionId() + "." + oldSecret;
+
+        Mockito.when(refreshSessionRepository.findBySessionIdForUpdate(session.getSessionId()))
+            .thenReturn(Optional.of(session));
+
+        RefreshTokenService.RotationResult result = refreshTokenService
+            .rotate(rawRefreshToken)
+            .orElseThrow();
+
+        String[] newTokenParts = result.issuedRefreshToken().refreshToken().split("\\.", 2);
+
+        assertThat(newTokenParts).hasSize(2);
+
+        String newSecret = newTokenParts[1];
+
+        assertThat(UUID.fromString(newTokenParts[0])).isEqualTo(session.getSessionId());
+        assertThat(newSecret).isNotEqualTo(oldSecret);
+        assertThat(session.getPreviousTokenHash()).isEqualTo(sha256(oldSecret));
+        assertThat(session.getTokenHash()).isEqualTo(sha256(newSecret));
+        assertThat(session.getRotatedAt()).isEqualTo(now);
+        assertThat(session.getLastUsedAt()).isEqualTo(now);
+        assertThat(session.getExpiresAt()).isEqualTo(originalExpiresAt);
+        assertThat(result.user()).isSameAs(user);
+        assertThat(result.issuedRefreshToken().expiresAt()).isEqualTo(originalExpiresAt);
+
     }
 
     private String sha256(String value) throws Exception {
