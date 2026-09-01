@@ -46,6 +46,28 @@ public class RefreshTokenService {
         return new IssuedRefreshToken(refreshToken, session.getExpiresAt());
     }
 
+    @Transactional
+    public void revoke(String rawRefreshToken) {
+        String[] tokenParts = rawRefreshToken.split("\\.", 2);
+
+        UUID sessionId = UUID.fromString(tokenParts[0]);
+        String secret = tokenParts[1];
+
+        refreshSessionRepository
+            .findBySessionIdForUpdate(sessionId)
+            .filter(session -> matches(secret, session.getTokenHash()))
+            .ifPresent(session -> session.revoke(LocalDateTime.now(clock)));
+    }
+
+    private boolean matches(String secret, String storedHash) {
+        String presentedHash = hash(secret);
+
+        return MessageDigest.isEqual(
+            presentedHash.getBytes(StandardCharsets.UTF_8),
+            storedHash.getBytes(StandardCharsets.UTF_8)
+        );
+    }
+
     private String generateSecret() {
         byte[] randomBytes = new byte[SECRET_BYTE_LENGTH];
         secureRandom.nextBytes(randomBytes);

@@ -16,11 +16,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.HexFormat;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
@@ -86,6 +84,26 @@ class RefreshTokenServiceTest {
         LocalDateTime expectedExpiration = LocalDateTime.now(fixedClock).plusDays(14);
 
         assertThat(result.expiresAt()).isEqualTo(expectedExpiration);
+    }
+
+    @Test
+    void 유효한_Refresh_Token이면_현재_세션을_폐기한다() throws Exception {
+        LocalDateTime now = LocalDateTime.now(fixedClock);
+        String secret = "logout-test-secret";
+
+        RefreshSession session = RefreshSession.issue(user, sha256(secret), now.minusDays(1), Duration.ofDays(14));
+
+        String refreshToken = session.getSessionId() + "." + secret;
+
+        Mockito.when(refreshSessionRepository.findBySessionIdForUpdate(session.getSessionId()))
+            .thenReturn(Optional.of(session));
+
+        refreshTokenService.revoke(refreshToken);
+
+        assertThat(session.isRevoked()).isTrue();
+        assertThat(session.getRevokedAt()).isEqualTo(now);
+
+        Mockito.verify(refreshSessionRepository).findBySessionIdForUpdate(session.getSessionId());
     }
 
     private String sha256(String value) throws Exception {
