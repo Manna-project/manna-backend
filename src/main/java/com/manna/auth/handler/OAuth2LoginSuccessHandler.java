@@ -66,7 +66,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             .httpOnly(true)
             .secure(cookieSecure)
             .sameSite("Lax")
-            .path("/api/v1/auth/refresh")
+            .path("/api/v1/auth")
             .maxAge(Duration.ofDays(14))
             .build();
 
