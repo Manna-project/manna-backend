@@ -9,6 +9,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -104,6 +106,19 @@ class RefreshTokenServiceTest {
         assertThat(session.getRevokedAt()).isEqualTo(now);
 
         Mockito.verify(refreshSessionRepository).findBySessionIdForUpdate(session.getSessionId());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "",
+        "invalid-token",
+        "not-a-uuid.secret"
+    })
+    void 로그아웃은_잘못된_Refresh_Token이어도_예외를_노출하지_않는다(String invalidRefreshToken) {
+        assertThatCode(() -> refreshTokenService.revoke(invalidRefreshToken))
+            .doesNotThrowAnyException();
+
+        Mockito.verifyNoInteractions(refreshSessionRepository);
     }
 
     private String sha256(String value) throws Exception {
