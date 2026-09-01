@@ -55,7 +55,7 @@ public class AuthSessionController {
             .secure(cookieSecure)
             .sameSite("Lax")
             .path("/")
-            .maxAge(Duration.ofDays(15))
+            .maxAge(Duration.ofMinutes(15))
             .build();
 
         Duration remainingRefreshLifetime = Duration.between(LocalDateTime.now(clock), issuedRefreshToken.expiresAt());

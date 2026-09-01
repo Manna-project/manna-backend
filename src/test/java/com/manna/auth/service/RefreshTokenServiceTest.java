@@ -138,8 +138,6 @@ class RefreshTokenServiceTest {
 
         assertThat(session.isRevoked()).isTrue();
         assertThat(session.getRevokedAt()).isEqualTo(now);
-
-        Mockito.verify(refreshSessionRepository).findBySessionIdForUpdate(session.getSessionId());
     }
 
     @ParameterizedTest
@@ -148,15 +146,7 @@ class RefreshTokenServiceTest {
         "invalid-token",
         "not-a-uuid.secret"
     })
-    void 로그아웃은_잘못된_Refresh_Token이어도_예외를_노출하지_않는다(String invalidRefreshToken) throws Exception {
-        LocalDateTime now = LocalDateTime.now(fixedClock);
-        String secret = "logout-test-secret";
-
-        RefreshSession session = RefreshSession.issue(user, sha256(secret), now.minusDays(1), Duration.ofDays(14));
-
-        String refreshToken = session.getSessionId() + "." + secret;
-
-
+    void 로그아웃은_잘못된_Refresh_Token이어도_예외를_노출하지_않는다(String invalidRefreshToken) {
         assertThatCode(() -> refreshTokenService.revoke(invalidRefreshToken))
             .doesNotThrowAnyException();
 

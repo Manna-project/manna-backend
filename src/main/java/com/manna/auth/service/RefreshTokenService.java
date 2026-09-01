@@ -68,14 +68,17 @@ public class RefreshTokenService {
 
     @Transactional
     public void revoke(String rawRefreshToken) {
-        String[] tokenParts = rawRefreshToken.split("\\.", 2);
+        Optional<ParsedRefreshToken> parsedToken = parseToken(rawRefreshToken);
 
-        UUID sessionId = UUID.fromString(tokenParts[0]);
-        String secret = tokenParts[1];
+        if (parsedToken.isEmpty()) {
+            return;
+        }
+
+        ParsedRefreshToken token = parsedToken.get();
 
         refreshSessionRepository
-            .findBySessionIdForUpdate(sessionId)
-            .filter(session -> matches(secret, session.getTokenHash()))
+            .findBySessionIdForUpdate(token.sessionId())
+            .filter(session -> matches(token.secret(), session.getTokenHash()))
             .ifPresent(session -> session.revoke(LocalDateTime.now(clock)));
     }
 
