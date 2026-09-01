@@ -1,6 +1,7 @@
 package com.manna.midpoint.client;
 
 import com.manna.midpoint.client.dto.KakaoCategorySearchResponse;
+import com.manna.midpoint.client.dto.KakaoTransitRouteResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -44,5 +45,33 @@ public class KakaoLocalClient {
             return Optional.empty();
         }
         return Optional.of(response.documents().get(0));
+    }
+
+    public Optional<Integer> findFastestTransitTimeSeconds(
+            double startLat, double startLng,
+            double endLat, double endLng
+    ) {
+        KakaoTransitRouteResponse response = restClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/v2/routing/publictraffic")
+                        .queryParam("start_x", startLng)
+                        .queryParam("start_y", startLng)
+                        .queryParam("end_x", endLng)
+                        .queryParam("end_y", endLat)
+                        .build())
+                .header("Authorization", "KakaoAK " + apiKey)
+                .retrieve()
+                .body(KakaoTransitRouteResponse.class);
+
+        if (response == null || !"OK".equals(response.status()) || response.routes().isEmpty()) {
+            return Optional.empty();
+        }
+
+        return response.routes().stream()
+                .mapToInt(route -> route.properties().totalTimeSeconds())
+                .min()
+                .stream()
+                .boxed()
+                .findFirst();
     }
 }
