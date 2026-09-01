@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.HexFormat;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -47,6 +48,25 @@ public class RefreshTokenService {
     }
 
     @Transactional
+    public Optional<RotationResult> rotate(String rawRefreshToken) {
+        Optional<ParsedRefreshToken> parsedToken = parseToken(rawRefreshToken);
+
+        if (parsedToken.isEmpty()) {
+            return Optional.empty();
+        }
+
+        ParsedRefreshToken token = parsedToken.get();
+        LocalDateTime now = LocalDateTime.now(clock);
+
+        return refreshSessionRepository
+            .findBySessionIdForUpdate(token.sessionId())
+            .filter(session -> !session.isRevoked())
+            .filter(session -> !session.isExpired(now))
+            .filter(session -> matches(token.secret(), session.getTokenHash()))
+            .map(session -> rotateSession(session, now));
+    }
+
+    @Transactional
     public void revoke(String rawRefreshToken) {
         String[] tokenParts = rawRefreshToken.split("\\.", 2);
 
@@ -66,6 +86,42 @@ public class RefreshTokenService {
             presentedHash.getBytes(StandardCharsets.UTF_8),
             storedHash.getBytes(StandardCharsets.UTF_8)
         );
+    }
+
+    private RotationResult rotateSession(RefreshSession session, LocalDateTime now) {
+        String newSecret = generateSecret();
+
+        session.rotate(hash(newSecret), now);
+
+        IssuedRefreshToken issuedRefreshToken = new IssuedRefreshToken(
+            composeToken(session.getSessionId(), newSecret),
+            session.getExpiresAt()
+        );
+
+        return new RotationResult(session.getUser(), issuedRefreshToken);
+    }
+
+    private Optional<ParsedRefreshToken> parseToken(String rawRefreshToken) {
+        if (rawRefreshToken == null || rawRefreshToken.isBlank()) {
+            return Optional.empty();
+        }
+
+        int separatorIndex = rawRefreshToken.indexOf('.');
+
+        if (separatorIndex <= 0
+            || separatorIndex == rawRefreshToken.length() - 1
+            || rawRefreshToken.indexOf('.', separatorIndex + 1) >= 0) {
+            return Optional.empty();
+        }
+
+        try {
+            UUID sessionId = UUID.fromString(rawRefreshToken.substring(0, separatorIndex));
+            String secret = rawRefreshToken.substring(separatorIndex + 1);
+
+            return Optional.of(new ParsedRefreshToken(sessionId, secret));
+        } catch (IllegalArgumentException exception) {
+            return Optional.empty();
+        }
     }
 
     private String generateSecret() {
@@ -89,5 +145,17 @@ public class RefreshTokenService {
 
     private String composeToken(UUID sessionId, String secret) {
         return sessionId + "." + secret;
+    }
+
+    public record RotationResult(
+        User user,
+        IssuedRefreshToken issuedRefreshToken
+    ) {
+    }
+
+    private record ParsedRefreshToken(
+        UUID sessionId,
+        String secret
+    ) {
     }
 }

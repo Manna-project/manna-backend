@@ -89,6 +89,40 @@ class RefreshTokenServiceTest {
     }
 
     @Test
+    void 유효한_Refresh_Token이면_새로운_Refresh_Token으로_갱신한다() throws Exception {
+        LocalDateTime now = LocalDateTime.now(fixedClock);
+        String oldSecret = "old-refresh-secret";
+
+        RefreshSession session = RefreshSession.issue(user, sha256(oldSecret), now.minusDays(1), Duration.ofDays(14));
+
+        LocalDateTime originalExpiresAt = session.getExpiresAt();
+        String rawRefreshToken = session.getSessionId() + "." + oldSecret;
+
+        Mockito.when(refreshSessionRepository.findBySessionIdForUpdate(session.getSessionId()))
+            .thenReturn(Optional.of(session));
+
+        RefreshTokenService.RotationResult result = refreshTokenService
+            .rotate(rawRefreshToken)
+            .orElseThrow();
+
+        String[] newTokenParts = result.issuedRefreshToken().refreshToken().split("\\.", 2);
+
+        assertThat(newTokenParts).hasSize(2);
+
+        String newSecret = newTokenParts[1];
+
+        assertThat(UUID.fromString(newTokenParts[0])).isEqualTo(session.getSessionId());
+        assertThat(newSecret).isNotEqualTo(oldSecret);
+        assertThat(session.getPreviousTokenHash()).isEqualTo(sha256(oldSecret));
+        assertThat(session.getTokenHash()).isEqualTo(sha256(newSecret));
+        assertThat(session.getRotatedAt()).isEqualTo(now);
+        assertThat(session.getLastUsedAt()).isEqualTo(now);
+        assertThat(session.getExpiresAt()).isEqualTo(originalExpiresAt);
+        assertThat(result.user()).isSameAs(user);
+        assertThat(result.issuedRefreshToken().expiresAt()).isEqualTo(originalExpiresAt);
+    }
+
+    @Test
     void 유효한_Refresh_Token이면_현재_세션을_폐기한다() throws Exception {
         LocalDateTime now = LocalDateTime.now(fixedClock);
         String secret = "logout-test-secret";
@@ -114,7 +148,15 @@ class RefreshTokenServiceTest {
         "invalid-token",
         "not-a-uuid.secret"
     })
-    void 로그아웃은_잘못된_Refresh_Token이어도_예외를_노출하지_않는다(String invalidRefreshToken) {
+    void 로그아웃은_잘못된_Refresh_Token이어도_예외를_노출하지_않는다(String invalidRefreshToken) throws Exception {
+        LocalDateTime now = LocalDateTime.now(fixedClock);
+        String secret = "logout-test-secret";
+
+        RefreshSession session = RefreshSession.issue(user, sha256(secret), now.minusDays(1), Duration.ofDays(14));
+
+        String refreshToken = session.getSessionId() + "." + secret;
+
+
         assertThatCode(() -> refreshTokenService.revoke(invalidRefreshToken))
             .doesNotThrowAnyException();
 
@@ -128,6 +170,4 @@ class RefreshTokenServiceTest {
 
         return HexFormat.of().formatHex(hash);
     }
-
-
 }
