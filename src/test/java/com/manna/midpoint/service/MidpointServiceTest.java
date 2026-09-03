@@ -81,7 +81,7 @@ public class MidpointServiceTest {
     }
 
     @Test
-    void 서울_부산() {
+    void 서울_부산_처럼_먼_극단적인_케이스_경우_계산이_되는지_확인() {
         OriginPoint seoul = new OriginPoint("서울", 37.5665, 126.9780);
         OriginPoint busan = new OriginPoint("부산", 35.1796, 129.0756);
 
@@ -98,6 +98,6 @@ public class MidpointServiceTest {
         OriginPoint jeju = new OriginPoint("제주", 33.4996, 126.5312);
 
         assertThatThrownBy(() -> midpointService.calculateMidpoint(List.of(seoul, jeju))).isInstanceOf(IllegalArgumentException.class);
-        
+
     }
 }
