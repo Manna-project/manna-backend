@@ -4,21 +4,18 @@ import com.manna.midpoint.client.KakaoLocalClient;
 import com.manna.midpoint.client.dto.KakaoCategorySearchResponse;
 import com.manna.midpoint.dto.MidpointResult;
 import com.manna.midpoint.dto.OriginPoint;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class MidpointFinderService {
 
     private final MidpointService midpointService;
     private final KakaoLocalClient kakaoLocalClient;
-
-    public MidpointFinderService(MidpointService midpointService, KakaoLocalClient kakaoLocalClient) {
-        this.midpointService = midpointService;
-        this.kakaoLocalClient = kakaoLocalClient;
-    }
 
     public MidpointResult findMidpoint(List<OriginPoint> originPoints) {
         MidpointResult calculated = midpointService.calculateMidpoint(originPoints);
