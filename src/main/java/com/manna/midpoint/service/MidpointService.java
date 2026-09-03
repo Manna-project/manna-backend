@@ -12,13 +12,14 @@ public class MidpointService {
     private static final double EARTH_RADIUS_KM = 6371.0;  // 지구 반지름 상수
     private static final int MAX_ITERATIONS = 100;  // 기하 중앙값을 구하는 Weiszfeld 알고리즘 최대 반복 횟수
     private static final double CONVERGENCE_THRESHOLD = 1e-8;  // 중간지점 좌표의 이동량이 해당 값보다 작아지면 반복 중지 (수렴 판단)
+    private static final int MIN_ORIGIN_COUNT = 2;
 
     public MidpointResult calculateMidpoint(List<OriginPoint> originPoints) {
 
         if (originPoints == null || originPoints.isEmpty()) {
             throw new IllegalArgumentException("출발지를 입력해주세요.");
         }
-        if (originPoints.size() < 2) {
+        if (originPoints.size() < MIN_ORIGIN_COUNT) {
             throw new IllegalArgumentException("최소 2명 이상의 출발지를 입력해주세요.");
         }
         for (OriginPoint o : originPoints) {
