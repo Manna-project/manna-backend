@@ -28,11 +28,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(Customizer.withDefaults())
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf.spa())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth ->
                     auth
-                        .requestMatchers("/api/v1/oauth2/**").permitAll()
+                        .requestMatchers(
+                            "/api/v1/oauth2/**",
+                            "/api/v1/auth/csrf",
+                            "/api/v1/auth/refresh"
+                        ).permitAll()
                         .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 ->
@@ -58,7 +62,14 @@ public class SecurityConfig {
             List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
         );
 
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(
+            List.of(
+                "*",
+                "Content-Type",
+                "X-XSRF-TOKEN",
+                "X-CSRF-TOKEN"
+            )
+        );
 
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);

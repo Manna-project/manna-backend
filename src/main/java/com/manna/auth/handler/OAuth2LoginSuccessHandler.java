@@ -1,10 +1,12 @@
 package com.manna.auth.handler;
 
 import com.manna.auth.dto.AuthUserInfo;
+import com.manna.auth.dto.IssuedRefreshToken;
 import com.manna.auth.entity.User;
 import com.manna.auth.service.AuthService;
 import com.manna.auth.service.JwtTokenService;
 import com.manna.auth.service.OAuth2UserInfoService;
+import com.manna.auth.service.RefreshTokenService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,6 +29,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private final AuthService authService;
     private final OAuth2UserInfoService oauth2UserInfoService;
     private final JwtTokenService jwtTokenService;
+    private final RefreshTokenService refreshTokenService;
 
     @Value("${FRONTEND_BASE_URL}")
     private String frontendBaseUrl;
@@ -44,9 +47,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         User loginUser = authService.login(userInfo);
 
         String accessToken = jwtTokenService.createAccessToken(loginUser);
-        String refreshToken = jwtTokenService.createRefreshToken(loginUser);
+        IssuedRefreshToken issuedRefreshToken = refreshTokenService.issue(loginUser);
 
-        addTokenCookies(response, accessToken, refreshToken);
+        addTokenCookies(response, accessToken, issuedRefreshToken.refreshToken());
 
         response.sendRedirect(frontendBaseUrl + "/oauth/callback");
     }
@@ -66,7 +69,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             .httpOnly(true)
             .secure(cookieSecure)
             .sameSite("Lax")
-            .path("/api/v1/auth/refresh")
+            .path("/api/v1/auth")
             .maxAge(Duration.ofDays(14))
             .build();
 
