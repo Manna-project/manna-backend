@@ -35,7 +35,8 @@ public class SecurityConfig {
                         .requestMatchers(
                             "/api/v1/oauth2/**",
                             "/api/v1/auth/csrf",
-                            "/api/v1/auth/refresh"
+                            "/api/v1/auth/refresh",
+                            "/api/v1/auth/logout"
                         ).permitAll()
                         .anyRequest().authenticated()
             )

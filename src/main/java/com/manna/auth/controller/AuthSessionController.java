@@ -48,6 +48,39 @@ public class AuthSessionController {
         addTokenCookies(response, accessToken, result.issuedRefreshToken());
     }
 
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@CookieValue(name = "refresh_token", required = false) String rawRefreshToken, HttpServletResponse response) {
+        if (rawRefreshToken != null) {
+            refreshTokenService.revoke(rawRefreshToken);
+        }
+
+        clearTokenCookies(response);
+    }
+
+    private void clearTokenCookies(HttpServletResponse response) {
+        ResponseCookie accessCookie = ResponseCookie
+            .from("access_token", "")
+            .httpOnly(true)
+            .secure(cookieSecure)
+            .sameSite("Lax")
+            .path("/")
+            .maxAge(Duration.ZERO)
+            .build();
+
+        ResponseCookie refreshCookie = ResponseCookie
+            .from("refresh_token", "")
+            .httpOnly(true)
+            .secure(cookieSecure)
+            .sameSite("Lax")
+            .path("/api/v1/auth")
+            .maxAge(Duration.ZERO)
+            .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+    }
+
     private void addTokenCookies(HttpServletResponse response, String accessToken, IssuedRefreshToken issuedRefreshToken) {
         ResponseCookie accessCookie = ResponseCookie
             .from("access_token", accessToken)
@@ -55,7 +88,7 @@ public class AuthSessionController {
             .secure(cookieSecure)
             .sameSite("Lax")
             .path("/")
-            .maxAge(Duration.ofDays(15))
+            .maxAge(Duration.ofMinutes(15))
             .build();
 
         Duration remainingRefreshLifetime = Duration.between(LocalDateTime.now(clock), issuedRefreshToken.expiresAt());

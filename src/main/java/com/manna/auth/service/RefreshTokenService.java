@@ -66,6 +66,31 @@ public class RefreshTokenService {
             .map(session -> rotateSession(session, now));
     }
 
+    @Transactional
+    public void revoke(String rawRefreshToken) {
+        Optional<ParsedRefreshToken> parsedToken = parseToken(rawRefreshToken);
+
+        if (parsedToken.isEmpty()) {
+            return;
+        }
+
+        ParsedRefreshToken token = parsedToken.get();
+
+        refreshSessionRepository
+            .findBySessionIdForUpdate(token.sessionId())
+            .filter(session -> matches(token.secret(), session.getTokenHash()))
+            .ifPresent(session -> session.revoke(LocalDateTime.now(clock)));
+    }
+
+    private boolean matches(String secret, String storedHash) {
+        String presentedHash = hash(secret);
+
+        return MessageDigest.isEqual(
+            presentedHash.getBytes(StandardCharsets.UTF_8),
+            storedHash.getBytes(StandardCharsets.UTF_8)
+        );
+    }
+
     private RotationResult rotateSession(RefreshSession session, LocalDateTime now) {
         String newSecret = generateSecret();
 
@@ -100,13 +125,6 @@ public class RefreshTokenService {
         } catch (IllegalArgumentException exception) {
             return Optional.empty();
         }
-    }
-
-    private boolean matches(String secret, String storedHash) {
-        byte[] presentedHash = hash(secret).getBytes(StandardCharsets.UTF_8);
-        byte[] expectedHash = storedHash.getBytes(StandardCharsets.UTF_8);
-
-        return MessageDigest.isEqual(presentedHash, expectedHash);
     }
 
     private String generateSecret() {
