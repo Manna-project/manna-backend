@@ -30,7 +30,8 @@ public class MidpointFinderService {
                         station.placeName(),
                         Double.parseDouble(station.lat()),
                         Double.parseDouble(station.lng()),
-                        calculated.avgDistanceKm()
+                        calculated.avgDistanceKm(),
+                        List.of()
                 )).orElse(calculated);
     }
 }
