@@ -66,7 +66,7 @@ public class MidpointService {
                 .mapToDouble(o -> haversine(finalLat, finalLng, o.lat(), o.lng()))
                 .average().orElse(0.0);
 
-        return new MidpointResult(null, finalLat, finalLng, avgDistanceKm);
+        return new MidpointResult(null, finalLat, finalLng, avgDistanceKm, List.of());
     }
 
     // 두 지점 사이가 실제 거리
