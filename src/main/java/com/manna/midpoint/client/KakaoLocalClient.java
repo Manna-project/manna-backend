@@ -55,7 +55,7 @@ public class KakaoLocalClient {
                 .uri(uriBuilder -> uriBuilder
                         .path("/v2/routing/publictraffic")
                         .queryParam("start_x", startLng)
-                        .queryParam("start_y", startLng)
+                        .queryParam("start_y", startLat)
                         .queryParam("end_x", endLng)
                         .queryParam("end_y", endLat)
                         .build())
