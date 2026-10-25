@@ -1,10 +1,13 @@
 package com.manna.midpoint.client;
 
+import com.manna.global.exception.BusinessException;
+import com.manna.global.exception.ErrorCode;
 import com.manna.midpoint.client.dto.KakaoCategorySearchResponse;
 import com.manna.midpoint.client.dto.KakaoTransitRouteResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.util.Optional;
 
@@ -28,18 +31,23 @@ public class KakaoLocalClient {
     }
 
     public Optional<KakaoCategorySearchResponse.Document> findNearestSubwayStation(double lat, double lng) {
-        KakaoCategorySearchResponse response = restClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/v2/local/search/category.json")
-                        .queryParam("category_group_code", SUBWAY_CATEGORY_CODE)
-                        .queryParam("x", lng)
-                        .queryParam("y", lat)
-                        .queryParam("radius", SEARCH_RADIUS_METERS)
-                        .queryParam("sort", "distance")
-                        .build())
-                .header("Authorization", "KakaoAK " + apiKey)
-                .retrieve()
-                .body(KakaoCategorySearchResponse.class);
+        KakaoCategorySearchResponse response;
+        try {
+            response = restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/v2/local/search/category.json")
+                            .queryParam("category_group_code", SUBWAY_CATEGORY_CODE)
+                            .queryParam("x", lng)
+                            .queryParam("y", lat)
+                            .queryParam("radius", SEARCH_RADIUS_METERS)
+                            .queryParam("sort", "distance")
+                            .build())
+                    .header("Authorization", "KakaoAK " + apiKey)
+                    .retrieve()
+                    .body(KakaoCategorySearchResponse.class);
+        } catch (RestClientException e) {
+            throw new BusinessException(ErrorCode.EXTERNAL_API_UNAVAILABLE, e);
+        }
 
         if (response == null || response.documents().isEmpty()) {
             return Optional.empty();
@@ -51,17 +59,22 @@ public class KakaoLocalClient {
             double startLat, double startLng,
             double endLat, double endLng
     ) {
-        KakaoTransitRouteResponse response = restClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/v2/routing/publictraffic")
-                        .queryParam("start_x", startLng)
-                        .queryParam("start_y", startLat)
-                        .queryParam("end_x", endLng)
-                        .queryParam("end_y", endLat)
-                        .build())
-                .header("Authorization", "KakaoAK " + apiKey)
-                .retrieve()
-                .body(KakaoTransitRouteResponse.class);
+        KakaoTransitRouteResponse response;
+        try {
+            response = restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/v2/routing/publictraffic")
+                            .queryParam("start_x", startLng)
+                            .queryParam("start_y", startLat)
+                            .queryParam("end_x", endLng)
+                            .queryParam("end_y", endLat)
+                            .build())
+                    .header("Authorization", "KakaoAK " + apiKey)
+                    .retrieve()
+                    .body(KakaoTransitRouteResponse.class);
+        } catch (RestClientException e) {
+            throw new BusinessException(ErrorCode.EXTERNAL_API_UNAVAILABLE, e);
+        }
 
         if (response == null || !"OK".equals(response.status()) || response.routes().isEmpty()) {
             return Optional.empty();
