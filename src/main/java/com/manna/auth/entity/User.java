@@ -56,7 +56,7 @@ public class User {
     private UUID entityId = UUID.randomUUID();
 
     @Builder
-    public User(LoginType loginType, String providerId, String email, String name, String nickname, String profileImage, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt, UUID entityId) {
+    public User(LoginType loginType, String providerId, String email, String name, String nickname, String profileImage, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
         this.loginType = loginType;
         this.providerId = providerId;
         this.email = email;
@@ -66,6 +66,5 @@ public class User {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
-        this.entityId = entityId;
     }
 }
